@@ -52,15 +52,37 @@ void usageTestExpression()
         [ $var - eq 11] // sets exit status to 1 (error)\n",
           stdout);
 }
+void usageCommandSubstitution()
+{
+    printfColored("Use: %s\n", "$(command)");
+    fputs("\
+    Example: \n\
+        var=$(ls) // replaces $(ls) with output of the command ls\n\
+        echo \"Output of ls command: $var\"\n",
+          stdout);
+}
+
+void usagePipe()
+{
+    printfColored("Use: command1 %s command2\n", "|");
+    fputs("\
+    Usage: Sends stdout of one command/process to stdin of \n\
+           Note that not all commands read from stdin or write to stdout!\n\
+    Example: \n\
+        cat file.txt | grep \"pattern\"",
+          stdout);
+}
 
 void usage()
 {
     fputs("Usage: bsb \"[QUERY]\" (make sure to enclose QUERY in quotes)\n\n", stdout);
     fputs("Your query is matched fuzzyly (Levensthein distance) to the queries below.\n\n", stdout);
     fputs("QUERY options:\n\
-    \"variable declaration\" how to declare a variable\n\
-    \"string interpolation\" how to interpolate a string\n\
-    \"test expression\" how to test the wether statement is true or false\n",
+    \"variable declaration\": how to declare a variable\n\
+    \"string interpolation\": how to interpolate a string\n\
+    \"test expression\": how to test the wether statement is true or false\n\
+    \"command substitution\": how to subsitute a command for the output of the command\n\
+    \"pipe commands\": how to send the output of one command to the input of the next\n",
           stdout);
 }
 
@@ -84,13 +106,20 @@ int main(int argc, char *argv[])
     {
         usageVariableDeclaration();
     }
-    if (strcmp(closestString, "string interpolation") == 0)
+    else if (strcmp(closestString, "string interpolation") == 0)
     {
         usageStringInterpolation();
     }
-    if (strcmp(closestString, "test expression") == 0)
+    else if (strcmp(closestString, "test expression") == 0)
     {
         usageTestExpression();
     }
-    return 0;
+    else if (strcmp(closestString, "command substitution") == 0)
+    {
+        usageCommandSubstitution();
+    }
+    else if (strcmp(closestString, "pipe command") == 0)
+    {
+        usagePipe();
+    }
 }
