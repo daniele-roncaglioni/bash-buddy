@@ -44,6 +44,32 @@ void usageDataTypes()
           stdout);
 }
 
+void usageStrings()
+{
+    printfColored("Use: %s\n", "\"\" or ''");
+    fputs("\
+    Usage: \n\
+        Single quotes are used for string literals: no string interplation is done\n\
+        Doube quotes are used for string interpolation\n\
+    Example: \n\
+        var=\"world\"\n\
+        echo 'Hello $var' // prints Hello $var\n\
+        echo \"Hello $var\" // prints Hello world\n",
+          stdout);
+}
+
+void usageArrays()
+{
+    printfColored("Use: %s\n", "()");
+    fputs("\
+    Example: \n\
+        varArray=(1 2 3)\n\
+        echo ${varArray[0]} // gets first element in array\n\
+        echo ${varArray[@]} // gets all elements in array using [@]\n\
+        echo ${#varArray[@]} // gets length of array using #\n",
+          stdout);
+}
+
 void usageSequence()
 {
     printfColored("Use: %s\n", "{start..end}");
@@ -66,7 +92,19 @@ void usageStringInterpolation()
     Example: \n\
         var=\"ld\"\n\
         echo \"Hello wor${var}\"\n\
-        echo \"With tand alone var name no need for {}: $var\"\n",
+        echo \"With stand alone var name no need for {}: $var\"\n\
+        # Undeclared vars\n\
+        echo \"${undeclaredVar:-Hello}\" // prints Hello if undeclaredVar is not set\n\
+        echo \"${undeclaredVar:=Hello}\"  # Outputs: Hello and assigns Hello to var if var is unset or null\n\
+        echo \"${var:?Variable not set}\"  # Prints an error message if var is unset or null\n\
+        # Length\n\
+        echo \"${#var}\"  # Gets lenght of var. In this case it outputs: 2\n\
+        # Slicing strings\n\
+        var=\"Hello, world\"\n\
+        echo \"${var:7:5}\"  # Outputs: world\n\
+        # Replace\n\
+        var=\"Hello, world\"\n\
+        echo \"${var/world/Earth}\"  # Outputs: Hello, Earth\n",
           stdout);
 }
 void usageArithmeticExpression()
@@ -85,8 +123,33 @@ void usageTestExpression()
     fputs("\
     Example:\n\
         var=10\n\
+        str=\"Hello\"\n\
+        file=\"bsb.txt\"\n\
         [ $var -eq 10 ] // sets exit status to 0 (success)\n\
-        [ $var - eq 11] // sets exit status to 1 (error)\n",
+        [ $var -eq 11] // sets exit status to 1 (error)\n\
+        [ \"$str\" = \"Hello\" ]\n\
+        [ -f \"$file\" ]\n\
+    Integer testing:\n\
+        -eq: equal\n\
+        -ne: not equal\n\
+        -gt: greater than\n\
+        -lt: less than\n\
+        -ge: greater than or equal\n\
+        -le: less than or equal\n\
+        -z: empty string\n\
+        -n: non-empty string\n\
+    File testing:\n\
+        -e: file exists\n\
+        -f: regular file (not a dir or other file types)\n\
+        -d: directory\n\
+        -r: readable\n\
+        -w: writable\n\
+        -x: executable\n\
+    String testing:\n\
+        =: equal\n\
+        !=: not equal\n\
+        <: less than (in ASCII order)\n\
+        >: greater than (in ASCII order)\n",
           stdout);
 }
 
@@ -108,6 +171,19 @@ void usagePipe()
            Note that not all commands read from stdin or write to stdout!\n\
     Example: \n\
         cat file.txt | grep \"pattern\"",
+          stdout);
+}
+
+void usageRedirection()
+{
+    printfColored("Use: %s\n", ">, >>, <");
+    fputs("\
+    Example: \n\
+        echo \"Hello\" > file.txt // writes Hello to file.txt\n\
+        echo \"World\" >> file.txt // appends World to file.txt\n\
+        cat < file.txt // reads file.txt and prints it to stdout\n\
+        grep someString someFile 2> error.txt // writes stderr to error.txt\n\
+        grep someString someFile 2>&1 // writes stderr to stdout\n",
           stdout);
 }
 
@@ -194,6 +270,46 @@ void usageUntilLoop()
         ",
           stdout);
 }
+
+void usageFunctions()
+{
+    printfColored("Use: %s\n", "\n\
+    function name() {\n\
+        ... \n\
+    }");
+    fputs("\
+    Example: \n\
+        function hello() {\n\
+            echo \"Hello\"\n\
+        }\n\
+        hello\n\
+        ",
+          stdout);
+}
+
+void usageExitStatus()
+{
+    printfColored("Use: %s\n", "$?");
+    fputs("\
+    Example: \n\
+        var=10\n\
+        [ $var -eq 10 ]\n\
+        echo $?\n\
+        ",
+          stdout);
+}
+
+void usageTrap()
+{
+    printfColored("Use: %s\n", "\n\
+    trap 'command' signal\n\
+    ");
+    fputs("\
+    Example: \n\
+        trap 'echo \"Caught signal\"' SIGINT\n",
+          stdout);
+}
+
 void usage()
 {
     fputs("Usage: bsb \"[QUERY]\" (make sure to enclose QUERY in quotes)\n\n", stdout);
@@ -201,20 +317,22 @@ void usage()
     fputs("QUERY options:\n\
     \"variable declaration\": how to declare a variable\n\
     \"data types - string integer list\": different data types in bash\n\
-    \"string interpolation\": how to interpolate a string\n\
+    \"strings\": how to work with strings\n\
+    \"arrays\": how to work with arrays\n\
+    \"string interpolation\": how to interpolate a string (also called parameter expansion)\n\
     \"arithmetic expression\": how to perform arithmetic operations\n\
     \"sequence\": how to create a sequence of numbers\n\
     \"test expression\": how to test the wether statement is true or false\n\
     \"command substitution\": how to subsitute a command for the output of the command\n\
-    \"pipe commands\": how to send the output of one command to the input of the next\n\
+    \"pipe command\": how to send the output of one command to the input of the next\n\
+    \"redirection\": how to redirect the output of a command from and to files or commands\n\
     \"conditional statements\": how to perform conditional execution based on a condition\n\
     \"for loop\": repeat a block of code multiple times with for\n\
     \"while loop\": repeat a block of code multiple times with while\n\
     \"until loop\": repeat a block of code multiple times with until\n\
     \"functions\": how to define and use functions\n\
-    \"file operations\": how to read from and write to files\n\
-    \"command line arguments\": how to pass arguments to a script or command\n\
-    \"environment variables\": how to access and modify environment variables\n",
+    \"exit status\": how to check the exit status of a command\n\
+    \"trap\": how to catch signals\n",
           stdout);
 }
 
@@ -238,6 +356,18 @@ int main(int argc, char *argv[])
     {
         usageVariableDeclaration();
     }
+    else if (strcmp(closestString, "data types - string integer list") == 0)
+    {
+        usageDataTypes();
+    }
+    else if (strcmp(closestString, "strings") == 0)
+    {
+        usageStrings();
+    }
+    else if (strcmp(closestString, "arrays") == 0)
+    {
+        usageArrays();
+    }
     else if (strcmp(closestString, "string interpolation") == 0)
     {
         usageStringInterpolation();
@@ -245,10 +375,6 @@ int main(int argc, char *argv[])
     else if (strcmp(closestString, "arithmetic expression") == 0)
     {
         usageArithmeticExpression();
-    }
-    else if (strcmp(closestString, "data types - string integer list") == 0)
-    {
-        usageDataTypes();
     }
     else if (strcmp(closestString, "sequence") == 0)
     {
@@ -266,6 +392,10 @@ int main(int argc, char *argv[])
     {
         usagePipe();
     }
+    else if (strcmp(closestString, "redirection") == 0)
+    {
+        usageRedirection();
+    }
     else if (strcmp(closestString, "conditional statement") == 0)
     {
         usageConditionalStatements();
@@ -281,6 +411,18 @@ int main(int argc, char *argv[])
     else if (strcmp(closestString, "until loop") == 0)
     {
         usageUntilLoop();
+    }
+    else if (strcmp(closestString, "functions") == 0)
+    {
+        usageFunctions();
+    }
+    else if (strcmp(closestString, "exit status") == 0)
+    {
+        usageExitStatus();
+    }
+    else if (strcmp(closestString, "trap") == 0)
+    {
+        usageTrap();
     }
     else
     {
