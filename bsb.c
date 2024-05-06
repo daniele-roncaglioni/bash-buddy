@@ -452,4 +452,5 @@ int main(int argc, char *argv[])
     int min_index = arg_min(distances, sizeof(queries) / sizeof(queries[0]));
     printf_colored("Based on your input we guessed your query is about: %s\n", queries[min_index]);
     usageFn[min_index]();
+    fputs("\n", stdout);
 }
