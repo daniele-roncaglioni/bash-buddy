@@ -3,29 +3,29 @@
 #include <stdlib.h>
 #include <math.h>
 
-void printfColored(char *textWithFormatPlaceholder, char *coloredText)
+void printf_colored(char *text_with_format_placeholder, char *colored_text)
 {
     const char *COLOR = "\033[0;35m";
     const char *ENDCOLOR = "\033[0m";
     const char *placeholder = "%s";
-    const char *formatSpecifierLocation = strstr(textWithFormatPlaceholder, placeholder);
-    if (formatSpecifierLocation == NULL)
+    const char *format_specifier_location = strstr(text_with_format_placeholder, placeholder);
+    if (format_specifier_location == NULL)
         return;
-    size_t resultLength = strlen(textWithFormatPlaceholder) + strlen(coloredText) + strlen(COLOR) + strlen(ENDCOLOR) - 2;
-    char *interpolatedText = (char *)malloc((resultLength + 1) * sizeof(char));
-    if (interpolatedText == NULL)
+    size_t resultLength = strlen(text_with_format_placeholder) + strlen(colored_text) + strlen(COLOR) + strlen(ENDCOLOR) - 2;
+    char *interpolated_text = (char *)malloc((resultLength + 1) * sizeof(char));
+    if (interpolated_text == NULL)
         return;
-    strncpy(interpolatedText, textWithFormatPlaceholder, formatSpecifierLocation - textWithFormatPlaceholder);
-    strcat(interpolatedText, COLOR);
-    strcat(interpolatedText, coloredText);
-    strcat(interpolatedText, ENDCOLOR);
-    strcat(interpolatedText, formatSpecifierLocation + 2);
-    interpolatedText[resultLength] = '\0';
-    fputs(interpolatedText, stdout);
-    free(interpolatedText);
+    strncpy(interpolated_text, text_with_format_placeholder, format_specifier_location - text_with_format_placeholder);
+    strcat(interpolated_text, COLOR);
+    strcat(interpolated_text, colored_text);
+    strcat(interpolated_text, ENDCOLOR);
+    strcat(interpolated_text, format_specifier_location + 2);
+    interpolated_text[resultLength] = '\0';
+    fputs(interpolated_text, stdout);
+    free(interpolated_text);
 }
 
-int levenshteinDistance(const char *s, const char *t)
+int levenshtein_distance(const char *s, const char *t)
 {
     int m = strlen(s);
     int n = strlen(t);
@@ -45,24 +45,24 @@ int levenshteinDistance(const char *s, const char *t)
     {
         for (int i = 1; i <= m; i++)
         {
-            int substitutionCost;
+            int substitution_cost;
             if (s[i - 1] == t[j - 1])
             {
-                substitutionCost = 0;
+                substitution_cost = 0;
             }
             else
             {
-                substitutionCost = 1;
+                substitution_cost = 1;
             }
-            d[i][j] = fmin(fmin(d[i - 1][j] + 1, d[i][j - 1] + 1), d[i - 1][j - 1] + substitutionCost);
+            d[i][j] = fmin(fmin(d[i - 1][j] + 1, d[i][j - 1] + 1), d[i - 1][j - 1] + substitution_cost);
         }
     }
     return d[m][n];
 }
 
-void usageVariableDeclaration()
+void usage_variable_declaration()
 {
-    printfColored("Use: %s (Note: no spaces before or after the =)\n", "=");
+    printf_colored("Use: %s (Note: no spaces before or after the =)\n", "=");
     fputs("\
     Example: \n\
         var1=\"hello\"\n\
@@ -70,9 +70,9 @@ void usageVariableDeclaration()
           stdout);
 }
 
-void usageDataTypes()
+void usage_data_types()
 {
-    printfColored("Use: %s\n", "string, integer, list");
+    printf_colored("Use: %s\n", "string, integer, list");
     fputs("\
     Example: \n\
         varStr=\"hello\"\n\
@@ -81,9 +81,9 @@ void usageDataTypes()
           stdout);
 }
 
-void usageStrings()
+void usage_strings()
 {
-    printfColored("Use: %s\n", "\"\" or ''");
+    printf_colored("Use: %s\n", "\"\" or ''");
     fputs("\
     Usage: \n\
         Single quotes are used for string literals: no string interplation is done\n\
@@ -95,9 +95,9 @@ void usageStrings()
           stdout);
 }
 
-void usageArrays()
+void usage_arrays()
 {
-    printfColored("Use: %s\n", "()");
+    printf_colored("Use: %s\n", "()");
     fputs("\
     Example: \n\
         varArray=(1 2 3)\n\
@@ -107,9 +107,9 @@ void usageArrays()
           stdout);
 }
 
-void usageSequence()
+void usage_sequence()
 {
-    printfColored("Use: %s\n", "{start..end}");
+    printf_colored("Use: %s\n", "{start..end}");
     fputs("\
     Example: \n\
         varArray=({1..3})\n\
@@ -124,7 +124,7 @@ void usageSequence()
 
 void usageStringInterpolation()
 {
-    printfColored("Use: %s\n", "${}");
+    printf_colored("Use: %s\n", "${}");
     fputs("\
     Example: \n\
         var=\"ld\"\n\
@@ -146,7 +146,7 @@ void usageStringInterpolation()
 }
 void usageArithmeticExpression()
 {
-    printfColored("Use: %s\n", "$((expression))");
+    printf_colored("Use: %s\n", "$((expression))");
     fputs("\
     Example: \n\
         var=$((1+2))\n\
@@ -154,9 +154,9 @@ void usageArithmeticExpression()
           stdout);
 }
 
-void usageTestExpression()
+void usage_test_expression()
 {
-    printfColored("Use: %s (Note: need spaces after and before [ and ])\n", "[ expression ]");
+    printf_colored("Use: %s (Note: need spaces after and before [ and ])\n", "[ expression ]");
     fputs("\
     Example:\n\
         var=10\n\
@@ -190,9 +190,9 @@ void usageTestExpression()
           stdout);
 }
 
-void usageCommandSubstitution()
+void usage_command_substitution()
 {
-    printfColored("Use: %s\n", "$(command)");
+    printf_colored("Use: %s\n", "$(command)");
     fputs("\
     Example: \n\
         var=$(ls) // replaces $(ls) with output of the command ls\n\
@@ -200,9 +200,9 @@ void usageCommandSubstitution()
           stdout);
 }
 
-void usagePipe()
+void usage_pipe()
 {
-    printfColored("Use: command1 %s command2\n", "|");
+    printf_colored("Use: command1 %s command2\n", "|");
     fputs("\
     Usage: Sends stdout of one command/process to stdin of \n\
            Note that not all commands read from stdin or write to stdout!\n\
@@ -211,9 +211,9 @@ void usagePipe()
           stdout);
 }
 
-void usageRedirection()
+void usage_redirection()
 {
-    printfColored("Use: %s\n", ">, >>, <");
+    printf_colored("Use: %s\n", ">, >>, <");
     fputs("\
     Example: \n\
         echo \"Hello\" > file.txt // writes Hello to file.txt\n\
@@ -224,9 +224,9 @@ void usageRedirection()
           stdout);
 }
 
-void usageConditionalStatements()
+void usage_conditional_statements()
 {
-    printfColored("Use: %s\n", "\n\
+    printf_colored("Use: %s\n", "\n\
     if [ condition ]; then\n\
         ... \n\
     else\n\
@@ -246,9 +246,9 @@ void usageConditionalStatements()
         ",
           stdout);
 }
-void usageForLoop()
+void usage_for_loop()
 {
-    printfColored("Use: %s\n", "\n\
+    printf_colored("Use: %s\n", "\n\
     for var in list; do\n\
         ... \n\
     done");
@@ -274,9 +274,9 @@ void usageForLoop()
           stdout);
 }
 
-void usageWhileLoop()
+void usage_while_loop()
 {
-    printfColored("Use: %s\n", "\n\
+    printf_colored("Use: %s\n", "\n\
     while [ condition ]; do\n\
         ... \n\
     done");
@@ -291,9 +291,9 @@ void usageWhileLoop()
           stdout);
 }
 
-void usageUntilLoop()
+void usage_until_loop()
 {
-    printfColored("Use: %s\n", "\n\
+    printf_colored("Use: %s\n", "\n\
     until [ condition ]; do\n\
         ... \n\
     done");
@@ -308,9 +308,9 @@ void usageUntilLoop()
           stdout);
 }
 
-void usageFunctions()
+void usage_functions()
 {
-    printfColored("Use: %s\n", "\n\
+    printf_colored("Use: %s\n", "\n\
     function name() {\n\
         ... \n\
     }");
@@ -324,9 +324,9 @@ void usageFunctions()
           stdout);
 }
 
-void usageExitStatus()
+void usage_exit_status()
 {
-    printfColored("Use: %s\n", "$?");
+    printf_colored("Use: %s\n", "$?");
     fputs("\
     Example: \n\
         var=10\n\
@@ -336,9 +336,9 @@ void usageExitStatus()
           stdout);
 }
 
-void usageTrap()
+void usage_trap()
 {
-    printfColored("Use: %s\n", "\n\
+    printf_colored("Use: %s\n", "\n\
     trap 'command' signal\n\
     ");
     fputs("\
@@ -350,7 +350,7 @@ void usageTrap()
 void usage()
 {
     fputs("Usage: bsb \"[QUERY]\" (make sure to enclose QUERY in quotes)\n\n", stdout);
-    fputs("Your query is matched fuzzyly (Levensthein distance) to the queries below.\n\n", stdout);
+    fputs("Your query is matched fuzzily (Levenshtein distance) to the queries below.\n\n", stdout);
     fputs("QUERY options:\n\
     \"variable declaration\": how to declare a variable\n\
     \"data types - string integer list\": different data types in bash\n\
@@ -373,9 +373,9 @@ void usage()
           stdout);
 }
 
-int argmin(int *array, int size)
+int arg_min(int *array, int size)
 {
-    int minIndex = 0;
+    int min_index = 0;
     int minValue = array[0];
 
     for (int i = 1; i < size; i++)
@@ -383,11 +383,11 @@ int argmin(int *array, int size)
         if (array[i] < minValue)
         {
             minValue = array[i];
-            minIndex = i;
+            min_index = i;
         }
     }
 
-    return minIndex;
+    return min_index;
 }
 
 char *queries[] = {
@@ -411,24 +411,24 @@ char *queries[] = {
     "trap"};
 
 void (*usageFn[])() = {
-    usageVariableDeclaration,
-    usageDataTypes,
-    usageStrings,
-    usageArrays,
+    usage_variable_declaration,
+    usage_data_types,
+    usage_strings,
+    usage_arrays,
     usageStringInterpolation,
     usageArithmeticExpression,
-    usageSequence,
-    usageTestExpression,
-    usageCommandSubstitution,
-    usagePipe,
-    usageRedirection,
-    usageConditionalStatements,
-    usageForLoop,
-    usageWhileLoop,
-    usageUntilLoop,
-    usageFunctions,
-    usageExitStatus,
-    usageTrap};
+    usage_sequence,
+    usage_test_expression,
+    usage_command_substitution,
+    usage_pipe,
+    usage_redirection,
+    usage_conditional_statements,
+    usage_for_loop,
+    usage_while_loop,
+    usage_until_loop,
+    usage_functions,
+    usage_exit_status,
+    usage_trap};
 
 int main(int argc, char *argv[])
 {
@@ -447,9 +447,9 @@ int main(int argc, char *argv[])
     int distances[sizeof(queries) / sizeof(queries[0])];
     for (int i = 0; i < sizeof(queries) / sizeof(queries[0]); i++)
     {
-        distances[i] = pow(levenshteinDistance(argv[1], queries[i]), 3) + pow(abs((int)strlen(queries[i]) - (int)strlen(argv[1])), 0.5); // penalty for length difference
+        distances[i] = pow(levenshtein_distance(argv[1], queries[i]), 3) + pow(abs((int)strlen(queries[i]) - (int)strlen(argv[1])), 0.5); // penalty for length difference
     }
-    int minIndex = argmin(distances, sizeof(queries) / sizeof(queries[0]));
-    printfColored("Based on your input the most likely query is: %s\n", queries[minIndex]);
-    usageFn[minIndex]();
+    int min_index = arg_min(distances, sizeof(queries) / sizeof(queries[0]));
+    printf_colored("Based on your input we guessed your query is about: %s\n", queries[min_index]);
+    usageFn[min_index]();
 }
