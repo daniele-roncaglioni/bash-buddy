@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 void printfColored(char *textWithFormatPlaceholder, char *coloredText)
 {
@@ -23,6 +24,42 @@ void printfColored(char *textWithFormatPlaceholder, char *coloredText)
     fputs(interpolatedText, stdout);
     free(interpolatedText);
 }
+
+int levenshteinDistance(const char *s, const char *t)
+{
+    int m = strlen(s);
+    int n = strlen(t);
+    int d[m + 1][n + 1];
+
+    for (int i = 0; i <= m; i++)
+    {
+        d[i][0] = i;
+    }
+
+    for (int j = 0; j <= n; j++)
+    {
+        d[0][j] = j;
+    }
+
+    for (int j = 1; j <= n; j++)
+    {
+        for (int i = 1; i <= m; i++)
+        {
+            int substitutionCost;
+            if (s[i - 1] == t[j - 1])
+            {
+                substitutionCost = 0;
+            }
+            else
+            {
+                substitutionCost = 1;
+            }
+            d[i][j] = fmin(fmin(d[i - 1][j] + 1, d[i][j - 1] + 1), d[i - 1][j - 1] + substitutionCost);
+        }
+    }
+    return d[m][n];
+}
+
 void usageVariableDeclaration()
 {
     printfColored("Use: %s (Note: no spaces before or after the =)\n", "=");
@@ -336,6 +373,63 @@ void usage()
           stdout);
 }
 
+int argmin(int *array, int size)
+{
+    int minIndex = 0;
+    int minValue = array[0];
+
+    for (int i = 1; i < size; i++)
+    {
+        if (array[i] < minValue)
+        {
+            minValue = array[i];
+            minIndex = i;
+        }
+    }
+
+    return minIndex;
+}
+
+char *queries[] = {
+    "variable declaration",
+    "data types",
+    "strings",
+    "arrays",
+    "string interpolation",
+    "arithmetic expression",
+    "sequence",
+    "test expression",
+    "command substitution",
+    "pipe command",
+    "redirection",
+    "conditional statements",
+    "for loop",
+    "while loop",
+    "until loop",
+    "functions",
+    "exit status",
+    "trap"};
+
+void (*usageFn[])() = {
+    usageVariableDeclaration,
+    usageDataTypes,
+    usageStrings,
+    usageArrays,
+    usageStringInterpolation,
+    usageArithmeticExpression,
+    usageSequence,
+    usageTestExpression,
+    usageCommandSubstitution,
+    usagePipe,
+    usageRedirection,
+    usageConditionalStatements,
+    usageForLoop,
+    usageWhileLoop,
+    usageUntilLoop,
+    usageFunctions,
+    usageExitStatus,
+    usageTrap};
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -350,83 +444,12 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    const char *closestString = argv[1];
-
-    if (strcmp(closestString, "variable declaration") == 0)
+    int distances[sizeof(queries) / sizeof(queries[0])];
+    for (int i = 0; i < sizeof(queries) / sizeof(queries[0]); i++)
     {
-        usageVariableDeclaration();
+        distances[i] = pow(levenshteinDistance(argv[1], queries[i]), 3) + pow(abs((int)strlen(queries[i]) - (int)strlen(argv[1])), 0.5); // penalty for length difference
     }
-    else if (strcmp(closestString, "data types - string integer list") == 0)
-    {
-        usageDataTypes();
-    }
-    else if (strcmp(closestString, "strings") == 0)
-    {
-        usageStrings();
-    }
-    else if (strcmp(closestString, "arrays") == 0)
-    {
-        usageArrays();
-    }
-    else if (strcmp(closestString, "string interpolation") == 0)
-    {
-        usageStringInterpolation();
-    }
-    else if (strcmp(closestString, "arithmetic expression") == 0)
-    {
-        usageArithmeticExpression();
-    }
-    else if (strcmp(closestString, "sequence") == 0)
-    {
-        usageSequence();
-    }
-    else if (strcmp(closestString, "test expression") == 0)
-    {
-        usageTestExpression();
-    }
-    else if (strcmp(closestString, "command substitution") == 0)
-    {
-        usageCommandSubstitution();
-    }
-    else if (strcmp(closestString, "pipe command") == 0)
-    {
-        usagePipe();
-    }
-    else if (strcmp(closestString, "redirection") == 0)
-    {
-        usageRedirection();
-    }
-    else if (strcmp(closestString, "conditional statement") == 0)
-    {
-        usageConditionalStatements();
-    }
-    else if (strcmp(closestString, "for loop") == 0)
-    {
-        usageForLoop();
-    }
-    else if (strcmp(closestString, "while loop") == 0)
-    {
-        usageWhileLoop();
-    }
-    else if (strcmp(closestString, "until loop") == 0)
-    {
-        usageUntilLoop();
-    }
-    else if (strcmp(closestString, "functions") == 0)
-    {
-        usageFunctions();
-    }
-    else if (strcmp(closestString, "exit status") == 0)
-    {
-        usageExitStatus();
-    }
-    else if (strcmp(closestString, "trap") == 0)
-    {
-        usageTrap();
-    }
-    else
-    {
-        fputs("No match found for your query.\n", stdout);
-        usage();
-    }
+    int minIndex = argmin(distances, sizeof(queries) / sizeof(queries[0]));
+    printfColored("Based on your input the most likely query is: %s\n", queries[minIndex]);
+    usageFn[minIndex]();
 }
