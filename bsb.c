@@ -150,7 +150,13 @@ void usageArithmeticExpression()
     fputs("\
     Example: \n\
         var=$((1+2))\n\
-        echo $var\n",
+        echo $var\n\
+    Arithmetic comparison operators:\n\
+        >: greater than\n\
+        <: less than\n\
+        >=: greater than or equal\n\
+        <=: less than or equal\n\
+        ==: equal\n",
           stdout);
 }
 
@@ -166,23 +172,35 @@ void usage_test_expression()
         [ $var -eq 11] // sets exit status to 1 (error)\n\
         [ \"$str\" = \"Hello\" ]\n\
         [ -f \"$file\" ]\n\
-    Integer testing:\n\
+    Arithmetic operators:\n\
         -eq: equal\n\
         -ne: not equal\n\
         -gt: greater than\n\
         -lt: less than\n\
         -ge: greater than or equal\n\
         -le: less than or equal\n\
-        -z: empty string\n\
-        -n: non-empty string\n\
-    File testing:\n\
+    File operators:\n\
         -e: file exists\n\
-        -f: regular file (not a dir or other file types)\n\
-        -d: directory\n\
+        -f: is regular file (not a dir or other file types)\n\
+        -d: is directory\n\
+        -h: is symbolic link\n\
+        -b: is block device\n\
+        -c: is character device\n\
+        -S: is socket\n\
+        -p: is pipe\n\
+        -t: is file descriptor (e.g. stdin, stdout, stderr)\n\
+        -N: is modified (newer than last read)\n\
+        -O: you own file\n\
+        -G: group id matches yours\n\
+        -g: set-group-id\n\
+        -k: sticky bit\n\
+        -u: setuid\n\
         -r: readable\n\
         -w: writable\n\
         -x: executable\n\
-    String testing:\n\
+    String operators:\n\
+        -z: empty string\n\
+        -n: non-empty string\n\
         =: equal\n\
         !=: not equal\n\
         <: less than (in ASCII order)\n\
@@ -347,6 +365,28 @@ void usage_trap()
           stdout);
 }
 
+void usage_special_variables()
+{
+    printf_colored("Use: %s\n", "$<symbol>");
+    fputs("\
+    Example: \n\
+        echo $0 // prints the name of the script\n\
+        echo $1 // prints the first argument\n\
+        echo $2-9 // prints the n-th argument\n\
+        echo $@ // prints all arguments\n\
+        echo $# // prints the number of arguments\n\
+        echo $* // prints all arguments as a single word\n\
+        echo \"$@\" // prints all arguments as separate strings\n\
+        echo ${#*} // prints the number of arguments\n\
+        echo ${#@} // prints the number of arguments\n\
+        echo $? // prints the return value / exit code\n\
+        echo $$ // prints the process ID (PID) of the script\n\
+        echo $- // prints the flags passed to the script\n\
+        echo $_ // prints the last argument of the previous command\n\
+        echo $! // prints the process ID (PID) of the last job run in background\n",
+          stdout);
+}
+
 void usage()
 {
     fputs("Usage: bsb \"[QUERY]\" (make sure to enclose QUERY in quotes)\n\n", stdout);
@@ -369,7 +409,8 @@ void usage()
     \"until loop\": repeat a block of code multiple times with until\n\
     \"functions\": how to define and use functions\n\
     \"exit status\": how to check the exit status of a command\n\
-    \"trap\": how to catch signals\n",
+    \"trap\": how to catch signals\n\
+    \"special variables\": special variables in bash\n",
           stdout);
 }
 
@@ -408,7 +449,8 @@ char *queries[] = {
     "until loop",
     "functions",
     "exit status",
-    "trap"};
+    "trap",
+    "special variables"};
 
 void (*usageFn[])() = {
     usage_variable_declaration,
@@ -428,7 +470,8 @@ void (*usageFn[])() = {
     usage_until_loop,
     usage_functions,
     usage_exit_status,
-    usage_trap};
+    usage_trap,
+    usage_special_variables};
 
 int main(int argc, char *argv[])
 {
